@@ -3,8 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Scopes\IsActiveScope;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\CustomerSeeder;
+use Database\Seeders\ProductSeeder;
+use Database\Seeders\ReviewSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -194,5 +198,30 @@ class CategoryTest extends TestCase
 
         $category = Category::withoutGlobalScopes([IsActiveScope::class])->find('FOOD');
         $this->assertNotNull($category);
+    }
+
+    public function testOneToMany()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        self::assertNotNull($category);
+
+        $products = $category->products;
+
+        self::assertNotNull($products);
+        self::assertCount(1, $products);
+    }
+
+    public function testHasManyThrough()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class, CustomerSeeder::class, ReviewSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $this->assertNotNull($category);
+
+        $reviews = $category->reviews;
+        $this->assertNotNull($reviews);
+        $this->assertCount(2, $reviews);
     }
 }
