@@ -18,13 +18,13 @@ class ImageSeeder extends Seeder
             $image = new Image();
             $image->url = "https://ucup.com/image/1.jpg";
             $image->imageable_id = "UCUP";
-            $image->imageable_type = Customer::class;
+            $image->imageable_type = 'customer';
             $image->save();
         } {
             $image = new Image();
             $image->url = "https://ucup.com/image/2.jpg";
             $image->imageable_id = "1";
-            $image->imageable_type = Product::class;
+            $image->imageable_type = 'product';
             $image->save();
         }
     }
