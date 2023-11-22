@@ -32,7 +32,8 @@ class CategoryTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $categories[] = [
                 "id" => "ID $i",
-                "name" => "Category $i"
+                "name" => "Category $i",
+                "is_active" => true
             ];
         }
 
@@ -73,6 +74,7 @@ class CategoryTest extends TestCase
             $category = new Category();
             $category->id = "ID $i";
             $category->name = "Category $i";
+            $category->is_active = true;
             $category->save();
         }
 
@@ -92,7 +94,8 @@ class CategoryTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $categories[] = [
                 "id" => "ID $i",
-                "name" => "Category $i"
+                "name" => "Category $i",
+                "is_active" => true
             ];
         }
 
@@ -125,7 +128,8 @@ class CategoryTest extends TestCase
         for ($i = 0; $i < 10; $i++) {
             $categories[] = [
                 "id" => "ID $i",
-                "name" => "Category $i"
+                "name" => "Category $i",
+                "is_active" => true
             ];
         }
 
@@ -210,7 +214,7 @@ class CategoryTest extends TestCase
         $products = $category->products;
 
         self::assertNotNull($products);
-        self::assertCount(1, $products);
+        self::assertCount(2, $products);
     }
 
     public function testHasManyThrough()
@@ -223,5 +227,26 @@ class CategoryTest extends TestCase
         $reviews = $category->reviews;
         $this->assertNotNull($reviews);
         $this->assertCount(2, $reviews);
+    }
+
+    public function testQueryRelations()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $products = $category->products()->where("price", "=", 200)->get();
+
+        $this->assertCount(1, $products);
+        $this->assertEquals(2, $products[0]->id);
+    }
+
+    public function testQueryRelationsAggeregate()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $total = $category->products()->count();
+
+        $this->assertEquals(2, $total);
     }
 }

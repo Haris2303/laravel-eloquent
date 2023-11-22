@@ -70,10 +70,10 @@ class CustomerTest extends TestCase
 
         $category = Category::find("FOOD");
         $products = $category->products;
-        $this->assertCount(1, $products);
+        $this->assertCount(2, $products);
 
         $outOfStockProducts = $category->products()->where("stock", "<=", "0")->get();
-        $this->assertCount(1, $outOfStockProducts);
+        $this->assertCount(2, $outOfStockProducts);
     }
 
     public function testHasOneThrough()

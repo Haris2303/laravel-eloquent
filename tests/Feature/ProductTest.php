@@ -13,6 +13,7 @@ use Database\Seeders\TagSeeder;
 use Database\Seeders\VoucherSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class ProductTest extends TestCase
@@ -102,5 +103,41 @@ class ProductTest extends TestCase
             $this->assertNotNull($vouchers);
             $this->assertCount(1, $vouchers);
         }
+    }
+
+    public function testEloquentCollection()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        // 2 products, 1, 2
+        $products = Product::query()->get();
+
+        // WHERE id IN (1, 2)
+        $products = $products->toQuery()->where('price', '=', 200)->get();
+        $this->assertNotNull($products);
+        $this->assertEquals("2", $products[0]->id);
+    }
+
+    public function testSerialization()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $products = Product::query()->get();
+        $this->assertCount(2, $products);
+
+        $json = $products->toJson(JSON_PRETTY_PRINT);
+        Log::info($json);
+    }
+
+    public function testSerializationRelation()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class, ImageSeeder::class]);
+
+        $products = Product::query()->get();
+        $products->load(['category', 'image']);
+        $this->assertCount(2, $products);
+
+        $json = $products->toJson(JSON_PRETTY_PRINT);
+        Log::info($json);
     }
 }
